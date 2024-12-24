@@ -7,7 +7,7 @@ pipeline {
     stages{
         stage('git checkout'){
             steps{
-                git branch: 'main', url: 'https://github.com/ManojKRISHNAPPA/test-1.git'
+                git branch: 'main', url: 'https://github.com/pradeepnayakaby/CI---Project.git'
             }
         }
         stage('compile'){
@@ -53,7 +53,7 @@ pipeline {
 
         stage('Pushing image to repository'){
             steps{
-                sh 'docker push manojkrishnappa/puneethrajkumar:1'
+                sh 'docker push pradeepnayakaby/puneethrajkumar:1'
             }
         }
 
