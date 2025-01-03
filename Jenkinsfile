@@ -1,62 +1,51 @@
-pipeline {
+pipeline{
     agent any
     tools{
-        jdk 'java-11'
-        maven 'maven'
+        jdk "java-11"
+        maven "maven"
     }
     stages{
-        stage('git checkout'){
+        stage("git chekout"){
             steps{
-                git branch: 'main', url: 'https://github.com/pradeepnayakaby/CI---Project.git'
+                git branch:"main",url:"https://github.com/pradeepnayakaby/CI---Project.git"
             }
         }
-        stage('compile'){
+        stage("compile"){
             steps{
                 sh "mvn compile"
             }
         }
-        stage('Build'){
+        stage("build"){
             steps{
-                sh "mvn clean install" 
+                sh "mvn install"
             }
         }
-        stage('Build and Tag Docker file'){
+        stage("build and tag docker"){
             steps{
-                sh "docker build -t manojkrishnappa/puneethrajkumar:1 ."
+                sh "docker build -t pradeepnayakaby/punithrajkumar:1 ."
             }
         }
-        stage('Docker image scan'){
-            steps{
-                 sh "trivy image --format table -o trivy-image-report.html manojkrishnappa/puneethrajkumar:1"
-            }
-        }
-
-        stage('Containersation'){
+        stage('containerzion'){
             steps{
                 sh '''
-                    docker stop c1
-                    docker rm c1
-                    docker run -it -d --name c1 -p 9001:8080 manojkrishnappa/puneethrajkumar:1
+                docker stop /pradeepnayakaby/punithrajkumar:1
+                docker rm pradeepnayakaby/punithrajkumar:1
+                docker run -it -d --name punithrajkumar_web_page -p 9000:8080 pradeepnayakaby/punithrajkumar:1
                 '''
             }
         }
-
-        stage('Login to Docker Hub') {
-                    steps {
-                        script {
-                            withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                                sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                            }
-                        }
-                    }
-        }
-
-        stage('Pushing image to repository'){
+        stage("login t docker hub"){
             steps{
-                sh 'docker push pradeepnayakaby/puneethrajkumar:1'
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                }
             }
         }
-
-
+        stage("pushing the images to repository"){
+            steps{
+                sh " docker push pradeepnayakaby/punithrajkumar:1 "
+            }
+        }
     }
 }
