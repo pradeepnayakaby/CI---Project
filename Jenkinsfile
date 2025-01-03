@@ -1,50 +1,54 @@
-pipeline{
+pipeline {
     agent any
-    tools{
+    tools {
         jdk "java-11"
         maven "maven"
     }
-    stages{
-        stage("git chekout"){
-            steps{
-                git branch:"main",url:"https://github.com/pradeepnayakaby/CI---Project.git"
+    stages {
+        stage("Git Checkout") {
+            steps {
+                git branch: "main", url: "https://github.com/pradeepnayakaby/CI---Project.git"
             }
         }
-        stage("compile"){
-            steps{
+        stage("Compile") {
+            steps {
                 sh "mvn compile"
             }
         }
-        stage("build"){
-            steps{
+        stage("Build") {
+            steps {
                 sh "mvn install"
             }
         }
-        stage("build and tag docker"){
-            steps{
+        stage("Build and Tag Docker Image") {
+            steps {
                 sh "docker build -t pradeepnayakaby/punithrajkumar:1 ."
             }
         }
-        stage('containerzion'){
-            steps{
-                sh '''
-                docker stop /pradeepnayakaby/punithrajkumar:1
-                docker rm pradeepnayakaby/punithrajkumar:1
-                docker run -it -d --name punithrajkumar_web_page -p 9000:8080 pradeepnayakaby/punithrajkumar:1
-                '''
-            }
-        }
-        stage("login t docker hub"){
-            steps{
-                script{
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+        stage('Containerization') {
+            steps {
+                script {
+                    // Stop and remove any existing containers with the same name
+                    sh '''
+                    docker stop punithrajkumar_web_page || true
+                    docker rm punithrajkumar_web_page || true
+                    docker run -it -d --name punithrajkumar_web_page -p 9000:8080 pradeepnayakaby/punithrajkumar:1
+                    '''
                 }
             }
         }
-        stage("pushing the images to repository"){
-            steps{
-                sh " docker push pradeepnayakaby/punithrajkumar:1 "
+        stage("Login to Docker Hub") {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    }
+                }
+            }
+        }
+        stage("Push the Image to Repository") {
+            steps {
+                sh "docker push pradeepnayakaby/punithrajkumar:1"
             }
         }
     }
