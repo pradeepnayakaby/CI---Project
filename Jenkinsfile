@@ -20,7 +20,7 @@ pipeline {
                 sh "mvn install"
             }
         }
-        stage("Build and Tag Docker Image") {
+        stage("Build and Tag Docker file") {
             steps {
                 sh "docker build -t pradeepnayakaby/punithrajkumar:1 ."
             }
